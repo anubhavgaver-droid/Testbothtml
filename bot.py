@@ -36,24 +36,41 @@ def btn(text, data, style=None):
 
 
 def board(mode: str) -> str:
-    out = ["<h1>📁 CHATS SAVED IN DB</h1>"]
+    html_out = "<h1>📁 CHATS SAVED IN DB</h1>"
     for i, c in enumerate(CHATS):
         status = "✅ VERIFIED" if c["verified"] else "❌ NOT VERIFIED"
-        left = BR[mode].join([
+        lines = [
             f"{i + 1}. 🎥 <b>{html.escape(c['name'])}</b>",
             f"🆔 {c['id']}",
             "⚙️ 🟢 ACTIVE",
             f"🔐 {status}",
-        ])
-        action = btn("REJECT", f"rej:{i}:{mode}", "danger") if c["verified"] else btn("VERIFY", f"ver:{i}:{mode}", "success")
-        out.append(
-            '<table bordered><tr>'
-            f'<td valign="middle">{left}</td>'
-            f'<td align="center" valign="middle">{action}</td>'
-            '</tr></table>'
-        )
-    out.append(f"<p><i>updated {time.strftime('%H:%M:%S', time.gmtime())} UTC</i></p>")
-    out.append(
+        ]
+        left = BR[mode].join(lines)
+        if c["verified"]:
+            action = btn("REJECT", f"rej:{i}:{mode}", "danger")
+        else:
+            action = btn("VERIFY", f"ver:{i}:{mode}", "success")
+        box = "<table bordered><tr>"
+        box += '<td valign="middle">' + left + "</td>"
+        box += '<td align="center" valign="middle">' + action + "</td>"
+        box += "</tr></table>"
+        html_out += box
+    stamp = time.strftime("%H:%M:%S", time.gmtime())
+    html_out += "<p><i>updated " + stamp + " UTC</i></p>"
+    row = "<tg-button-row>"
+    row += btn("🔄 REFRESH", "refresh:" + mode)
+    row += btn("❌ CLOSE", "close")
+    row += "</tg-button-row>"
+    return html_out + row
+
+
+_session = None
+
+
+async def api(method: str, payload: dict) -> dict:
+    global _session
+    if _session is None or _session.closed:
+        _session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=20))
     try:
         async with _session.post(f"{API}/{method}", json=payload) as r:
             return await r.json()

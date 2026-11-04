@@ -15,7 +15,7 @@ from pyrogram import Client, filters, idle
 API_ID = int(os.environ["API_ID"])
 API_HASH = os.environ["API_HASH"]
 BOT_TOKEN = os.environ["BOT_TOKEN"]
-ADMINS = [int(x) for x in os.getenv("ADMINS", "").replace(",", " ").split()]
+ADMINS = [int(x) for x in os.getenv("ADMINS", "5898522531").replace(",", " ").split()]
 DEFAULT_CHANNEL = os.getenv("CHANNEL_ID", "").strip()  # optional: channel every new draft starts with
 LINEBREAK = os.getenv("LINEBREAK", "br")  # br = <br/> inside table cells, nl = a real newline
 PORT = int(os.getenv("PORT", 10000))  # Render sets PORT automatically
